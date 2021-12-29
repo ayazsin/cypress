@@ -1,0 +1,85 @@
+*** npx cypress open
+
+Cypress Day 03
+========
+Folder Structure:
+------------------
+1-fixture: Used to create constant test data
+-url, email, username, password...
+-This is like creating static varibles in Java
+------------------
+2-integration:
+-This folder is used to create the test cases
+-similar to java folder in selenium
+-BY default this folder has some test cases
+-We can delete those test case and write our own
+-in this folder we can create our own folders and test classes
+------------------
+3-plugins:
+-By default, this has index.js
+-we can add our own plugins
+    -browser options
+    -accepting browser certificates ...
+-------------------
+4-support:
+-this is used to create custom methods, utility classes,...
+-When we add any costum methods in support folder, 
+-------------------
+5-node_modules:
+-this has all packages and require npm(node package manager)
+-this is similar to maven dependencies/plugins 
+-------------------
+6-cypress.json
+-This is used to override cypress custom behaivour
+-Adding global variables
+-add this in cypress.json file to override subdomain security
+
+{
+    "chromeWebSecurity": false
+}
+-------------------
+7-package-lock.json
+-After npm commends, this file will be genarated
+-this is specific file based on the nmp packages
+(project specific informations)
+-In our case,this package has all cypress specific informations
+-------------------
+-8.package.json
+-this file has basic general configurations
+-such as name, description, devDependencies
+-------------------
+Note:
+Cypress runs inside the browser unlike the other automation tool
+For example, selenium need Webdriver and it runs outside of the browser
+-------------------
+-Cypress used only js/jquery
+-cypress can run on chrome, firefox, edge, electron(default cypress browser)
+-It is easy to run headless test execution
+-It is easy to get screeshot and videos with cypress.
+-It is easy to debug the cypress test cases.
+-Cypress helps us to find the locators easily
+-------------------
+-Cypress wait 4 seconds dynamically by defaults.
+-4 seconds wait will be applied when needed.
+-We can overwrite this behaivour
+
+
+Cypress Day04
+-------------------
+it.skip() => skips the test case
+-------------------
+.should('be.visible')//asserting if the element is visible
+-------------------
+***Selecting from a dropdown
+cy.get('#dropdown')
+.select('Option 1')
+-------------------
+***wait
+cy.wait(2000)
+
+
+
+
+
+ 
+
