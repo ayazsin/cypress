@@ -64,18 +64,472 @@ For example, selenium need Webdriver and it runs outside of the browser
 -We can overwrite this behaivour
 
 
-Cypress Day04
--------------------
+Cypress Day4
+-----
 it.skip() => skips the test case
--------------------
+-----
 .should('be.visible')//asserting if the element is visible
--------------------
+------
 ***Selecting from a dropdown
-cy.get('#dropdown')
+cy
+.get('#dropdown')
 .select('Option 1')
--------------------
-***wait
+
+* { force: true } => when the dropdown element is covered by other elements
+or the dropdown element is hidden, 
+then cypress can fail to click
+Then we need to for to select from teh dropdown
+
+cy
+.get('#icp-selected-country')
+.select('Canada',{ force: true })
+-------
+***Wait
 cy.wait(2000)
+--------
+***Suggested elements
+It is important to locate the correct elements
+We first manually understand the locator of the suggested list
+Then we can locate one of the option then click
+ // METHOD 1 is locate the one of the suggested option
+//Then click on it
+cy
+.get('.ac_results > ul > :nth-child(2)')
+.click()
+
+
+//METHOD 2 is to use contains
+//and click on it
+cy
+.get('.ac_results')//Summer Dresses > Printed Summer,Evening Dresses > Printed ,Summer Dresses > Printed Summer ,..
+.contains('Printed')//Click on the 1st element if there are multiple match
+.click()
+
+-------
+**Mouse Over 
+-Cypress uses trigger function to do mouse actions
+-To move over to an element we use .trigger('mouseover')
+cy
+.get('.icp-nav-link-inner')//getting the element 
+.trigger('mouseover')//moving the mouse over
+------
+***Scroll
+*scrollIntoView
+cy
+.get('.col-md-7 > .mb-4')
+.scrollIntoView();  
+
+*scrollTo
+cy
+.scrollTo(0, 1000)//scrolling 1000 px down
+cy.wait(2000)
+cy
+.scrollTo(0, -500)//scrolling 500 px up
+
+---------
+***checkbox
+-check() or click() to check the checkbox
+	-If there are multiple elements, check() will check them all
+-uncheck() is used to uncheck the checkboxes
+	-If there are multiple elements, uncheck() will uncheck them all
+--------------------------------------------
+***alerts
+-Cypress automatically accepts alert when you click on alert button
+
+***Assertion:
+-We use below syntax to assert the text
+-Checking if the element text = You successfully clicked an alert
+should('have.text','You successfully clicked an alert')
+
+
+DAY 03
+---------------
+***Frames***
+frames are pages within a page
+there are multiple html tag in a single page
+
+1.install plugin : 
+    LINK: https://www.npmjs.com/package/cypress-iframe
+    RUN ON TERMINAL : npm install -D cypress-iframe
+2. IMPORT PACKAGE IN THE CLASS : import 'cypress-iframe';
+
+3. cy.frameLoaded('CSS OF THE FRAME');
+
+4. Once we are inside the the frame, we need to use below sysntax to find element
+cy.iframe().find('CSS OF ELEMENT')
+----------------------------------
+***Working with multiple windows
+-cypress cannot open the new window
+-but we can manupilate the element
+-WAY 1. for example we can remove the target attribute using cypress automation
+so the window will open in the same  window
+
+Click Here Element:
+<a href="/windows/new" ,="" target="_blank">Click Here</a>
+
+target="_blank"       ===>>> make this open in the new window!!!!
+href="/windows/new"   ===>>> url you want to open
+
+When you click on the button, it will open in a new window(target="_blank")
+And url will have /windows/new extension (href="/windows/new")
+
+
+-WAY 2.  We will get the value of href
+    And store in a variable
+    Then open the value in the same window
+    prop() to get value of the attribute
+    prop() is a jquery method
+    since prop is a jquery we use then() to use prop function
+
+Click Here Element:
+<a href="/windows/new" ,="" target="_blank">Click Here</a>
+
+href="/windows/new"   ===>>> url you want to open
+ cy
+    .get('.example > a')//click here element
+    .then((element)=>{
+      const newURL =  element.prop('href')//getting the value of href attribute
+      https://the-internet.herokuapp.com/windows/new
+
+      cy.visit(newURL)
+    })
+
+
+***More on mouse keyboard actions
+
+******Creating Custom Methods*******
+We use commands.js to create custom methods so they will be visible in th entire framework
+-Create a custom method 
+-name : login
+-parameters (email,password)
+-functionality 
+	-click on the Sign in link
+	-type email and password
+	-click on the sign in button
+
+
+/*
+-Create a custom method 
+-name : login
+-parameters (email,password)
+-functionality 
+    -go to the link
+	-click on the Sign in link
+	-type email and password
+	-click on the sign in button
+*/
+Cypress.Commands.add('login',(email,password) => {
+    cy.visit("http://automationpractice.com/index.php")
+    cy.get('.login').click()
+    cy.get('#email').type(email)
+    cy.get('#passwd').type(password)
+    cy.get('#SubmitLogin > span').click()
+})
+
+
+CALL THIS CUSTOM METHOD IN THE TEST CLASS:
+
+describe('custom method', ()=>{
+
+    it('log in',()=>{
+   
+        cy
+        .login('cdef!@gmail.com','12345')//login the  name of the method we created in the Commands.js file
+    })
+})
+
+Day04
+***Custom commands review***
+We create custom commands in the commands.js file
+These custom commands are visible in teh entire fromework automatically
+This means I can call any method in any test class
+We call than method from the test classes using cy.COMMANDNAME(PARAMATER)
+
+1. Adding custom command in the commands.js
+Cypress.Commands.add('amazonSearch',(productName) => {
+})
+In this example,
+name of the method : amazonSearch
+name of the argument/parameter : productName
+
+2. Call in the test class.
+describe('Search',()=>{
+    it('amazon search',()=>{
+     cy
+     .amazonSearch('teapot')  
+    })
+})
+In this test class,
+we call .amazonSearch('teapot')
+amazonSearch is the method name 
+teapot is the argument
+---------------------
+***FILE UPLOAD****
+1. go to https://www.npmjs.com/package/cypress-file-upload
+run below command in the project level
+npm install --save-dev cypress-file-upload
+
+2.In commands.js under support folder, 
+import 'cypress-file-upload';
+
+3. Add an image in the fixture folder 
+Fixture is used to hold test data
+Image name : image1.jpeg
+
+4. Create a test class day04_file_upload.js
+-----------------------
+***VievPorts**
+https://docs.cypress.io/api/commands/viewport#Syntax
+This is to test the application in different screen sizes
+mac, ipad, iphone, samsung,...
+---------------------------------------
+***RUN CYPRESS TESTS FROM THE COMMAND OR TERMINAL
+1. We can runs cypress test cases using cypress runner
+That is what we have been doing
+
+2. We can run the cypress test using the TERMINAL
+https://docs.cypress.io/guides/guides/command-line#cypress-run
+By default, cypress runs on electron headless
+
+---------STEPS RUNNING FROM THE TERMINAL------
+1. Make sure you are in the project directory: techproeds-iMac:my-cypress-framework techproed$
+*** runs all tests headless
+2. ./node_modules/.bin/cypress run 
+
+********************
+===IF YOU SEE ERRORS====
+1.Delete Cypress folder:
+/Users/techproed/Library/Caches/Cypress/ 
+
+2. Install again: 
+Get in the project directory and run below command
+npm install --save-dev cypress
+**************************
+
+***run single test case (spec file)
+./node_modules/.bin/cypress run --spec PATH OF THE SPEC FILE
+
+Below command runs day01_login_test.js only on the headless on electron
+./node_modules/.bin/cypress run --spec cypress/integration/com.techproed/day01_login_test.js
+
+Below command runs day01_login_test.js only on the browser 
+-ADD --headed 
+-Runs on electron headed
+-Closes the broser automatically when the test case is complete
+./node_modules/.bin/cypress run --spec cypress/integration/com.techproed/day01_login_test.js --headed
+
+***run all test in certain package:
+package: com.techproed
+tests  : all of the tests
+* means ALL
+./node_modules/.bin/cypress run --spec cypress/integration/com.techproed/*.js
+
+***run on chrome from TERMINAL
+./node_modules/.bin/cypress run --spec cypress/integration/com.techproed/day01_login_test.js --browser chrome
+./node_modules/.bin/cypress run --spec cypress/integration/com.techproed/day01_login_test.js --browser firefox
+
+
+*****MOCHA FRAMEWORK***
+https://mochajs.org/
+-Cypress uses mocha framework by default
+-Mocha is a javascroipt testing framework
+-Some of the most used properties :
+describe  => to create test classes.
+it()      => to create single test cases
+before()  => runs before ALL it() only once. like beforeclass in testNG
+beforeEach()=>runs before each it() only once. like beforemethod in testNG
+after()  => runs after ALL it() only once. like afterclass in testNG
+afterEach()=>runs after each it() only once. like aftermethod in testNG
+it().skip() => to skip test cases
+it().only() => to run specific test case
+-----------------
+We use these annotation for precondition, test cases, postcondition, assertions
+-----------------
+./node_modules/.bin/cypress run --spec cypress/integration/com.techproed/day04_mocha_hooks.js --browser chrome
+
+
+******CYPRESS DASHBOARD******
+-Log in with git hub or gmail credendials
+-Create a project
+-Add projectID on cypress.json
+{
+  "chromeWebSecurity": false,
+  "projectId": "8yzr4r"
+}
+-Run the tests using cypress dashboard key form the terminal 
+
+
+***Running all test and recording on dashboard project
+./node_modules/.bin/cypress run --record --key 07e2f4c5-a0c3-430b-822e-0c9a55e39d78
+
+**Running specific test case and saving the rpeorts on the dashboard
+./node_modules/.bin/cypress run --spec cypress/integration/com.techproed/day01_login_test.js --record --key 07e2f4c5-a0c3-430b-822e-0c9a55e39d78
+
+-Then you should see all of the reports onyour cypress dashboard
+================================
+*****CYPRESS HTML REPORTS*****
+***Mocha Awesome Reports!!!!!!
+
+INSTALLATION STEPS:
+1.
+LINK : https://www.npmjs.com/package/mochawesome
+COMMAND: npm install --save-dev mochawesome
+
+2.
+LINK : https://www.npmjs.com/package/mochawesome-merge
+COMMAND : npm install mochawesome-merge --save-dev
+
+3.
+LINK : https://www.npmjs.com/package/mochawesome-report-generator
+COMMAND : npm install -g mochawesome-report-generator
+--------------------
+NOTE:
+IF YOU HAVE PERMISSION ISSUE RUN THIS AND ENTER YOUR PASS:
+sudo chown -R $USER /usr/local/lib/node_modules
+-------------------
+
+4. Add mochawesome report configurations inside CYPRESS.JSON FILE
+{
+  "chromeWebSecurity": false,
+  "reporter": "mochawesome",
+    "reporterOptions": {
+      "reportDir": "cypress/reports",
+      "reportFilename": "report",
+      "overwrite": false,
+      "html": true,
+      "json": true,
+      "charts": true
+    },
+    "video": false
+}
+
+
+5. Run from terminal:
+./node_modules/.bin/cypress run --spec cypress/integration/com.techproed/day01_login_test.js
+
+
+6. Then you should see reports folder
+Under reports folder, there should be report.html and report.json reports
+
+*****TO MERGE THE REPORTS ******
+
+7. In package.json > scripts
+Add below to merge single reports and output.html to see all the reports as single file
+
+ "merge": "mochawesome-merge cypress/reports/*.json > cypress/reports/output.json",
+ "generate_mochawesome_report": "marge cypress/reports/output.json --reportDir ./ --inline"
+
+
+8. npm run merge
+   npm run generate_mochawesome_report
+
+   THEN YOU SHOULD SEE OUTPUT.HTML 
+   OPEN output.html then you should see all piece of reports are merge in this single file
+
+   The end ... 
+
+Day05
+-------
+***Fixtures:
+--------------
+https://paylinn.com/
+
+Username : User
+Password : user
+--------------
+Create a new class: day05_paylinn_login.js
+----getting data from Fixtures---
+1. create a class
+day05_paylinn_login_with_fixture.js
+
+2. create a json file under fixtures
+File name : creds.json
+
+{
+    "username":"User",
+    "password":"user"
+}
+----------------
+***PAGE OBJECT MODEL WITH CYPRESS
+-pom is used to design framework,
+-It is used for easy easy maintanance, easy flow, understandable objects
+-We create page object in a new package and differenct page class
+-POM is used to seperate the page objects from the test class so the test classes looks siple and more understandable
+STEPS:
+1. Create a package: pageObjectRepository
+2. Create 2 page classes :HomePage.js, LoginPage.js
+3. Create methods that returns the page objects 
+
+For example for HomePage.js we need to return Sign in link element
+
+class HomePage {
+    getSigninLink(){
+        return cy.contains('Sign In')
+    }
+}
+export default HomePage;
+
+CREATE A TEST CLASS: day05_POM_test.js
+
+Day06
+----------------
+****Scripts
+npm run ......=> used to run test scripts that is inside the package.json
+for example, to run login test:
+./node_modules/.bin/cypress run --spec cypress/integration/com.techproed/day01_login_test.js
+
+-- Run all test cases:
+./node_modules/.bin/cypress run
+let's create a new script to run all test cases
+Steps:
+1. create a new script for running All test cases
+package.json>script Add test as following
+"test": "./node_modules/.bin/cypress run",
+
+Then run : 
+npm run test
+
+Now this is the same as :
+./node_modules/.bin/cypress run
+
+2. running headed node_modules
+./node_modules/.bin/cypress run --headed
+
+shortcut ==> Add below in Scripts
+" test-headed":"./node_modules/.bin/cypress run --headed"
+
+Then Run :
+npm run test-headed
+
+3. running headed mode on Chrome
+./node_modules/.bin/cypress run --headed --browser=Chrome
+
+Add script:
+"test-chrome":"./node_modules/.bin/cypress run --headed --browser=Chrome"
+
+4. running headed mode on firefox
+./node_modules/.bin/cypress run --headed --browser=firefox
+
+5. running codes on the dashboard
+./node_modules/.bin/cypress run --record --key 4dc52bff-ef04-41f8-92ed-bde4f5d2bd31
+
+Run script:
+"test-dashboard":"./node_modules/.bin/cypress run --record --key 4dc52bff-ef04-41f8-92ed-bde4f5d2bd31"
+
+Then Run:
+npm test-dashboard
+
+===========================
+
+*** rerun failed scenarios
+https://docs.cypress.io/guides/test-retries
+
+ADD Below in cypress.json file:
+"retries":{
+          "runMode":2,
+          "openMode":0
+      }
+
 
 
 
